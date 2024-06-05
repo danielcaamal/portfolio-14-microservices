@@ -1,0 +1,3 @@
+[submodule "products-ms"]
+	path = products-ms
+	url = git@github.com:danielcaamal/products-ms.git
