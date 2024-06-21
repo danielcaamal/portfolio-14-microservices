@@ -45,6 +45,19 @@ services:
       - ./orders-ms/.env
     depends_on:
       - orders-db
+
+  payments-ms:
+    container_name: payments-ms
+    build: ./payments-ms
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./payments-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./payments-ms/.env
+    depends_on:
+      - nats-server
   
   orders-db:
     container_name: orders-db
