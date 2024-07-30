@@ -1,0 +1,114 @@
+version: '3'
+
+services:
+  nats-server:
+    container_name: nats-server
+    image: nats:latest
+
+  client-gateway:
+    container_name: client-gateway
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: client-gateway-prod
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+    environment:
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - NATS_SERVERS=nats://nats-server:4222,nats://nats-server:4223
+    depends_on:
+      - nats-server
+
+  auth-ms:
+    container_name: auth-ms
+    build:
+      context: ./auth-ms
+      dockerfile: dockerfile.prod
+      args:
+        - DATABASE_URL=mongodb://${AUTH_DB_USERNAME}:${AUTH_DB_PASSWORD}@auth-db:27017/${AUTH_DB_NAME}?authSource=admin&directConnection=true
+    image: auth-ms-prod
+    ports:
+      - ${AUTH_MS_PORT}:${AUTH_MS_PORT}
+    environment:
+      - PORT=${AUTH_MS_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - DATABASE_URL=mongodb://${AUTH_DB_USERNAME}:${AUTH_DB_PASSWORD}@auth-db:27017/${AUTH_DB_NAME}?authSource=admin&directConnection=true
+      - NATS_SERVERS=nats://nats-server:4222,nats://nats-server:4223
+    depends_on:
+      - nats-server
+      - auth-db
+
+  products-ms:
+    container_name: products-ms
+    build:
+      context: ./products-ms
+      dockerfile: dockerfile.prod
+      args:
+        - DATABASE_URL=file:./dev.db
+    image: products-ms-prod
+    ports:
+      - ${PRODUCTS_MS_PORT}:${PRODUCTS_MS_PORT}
+    environment:
+      - PORT=${PRODUCTS_MS_PORT}
+      - DATABASE_URL=file:./dev.db
+      - NATS_SERVERS=nats://nats-server:4222,nats://nats-server:4223
+    depends_on:
+      - nats-server
+
+  orders-ms:
+    container_name: orders-ms
+    build:
+      context: ./orders-ms
+      dockerfile: dockerfile.prod
+      args:
+        - DATABASE_URL=postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/${ORDERS_DB_NAME}
+    image: orders-ms-prod
+    ports:
+      - ${ORDERS_MS_PORT}:${ORDERS_MS_PORT}
+    environment:
+      - PORT=${ORDERS_MS_PORT}
+      - DATABASE_URL=postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/${ORDERS_DB_NAME}
+      - NATS_SERVERS=nats://nats-server:4222,nats://nats-server:4223
+    depends_on:
+      - nats-server
+      - orders-db
+
+  payments-ms:
+    container_name: payments-ms
+    build:
+      context: ./payments-ms
+      dockerfile: dockerfile.prod
+    image: payments-ms-prod
+    ports:
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
+    environment:
+      - PORT=${PAYMENTS_MS_PORT}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_SUCCESS_URL=${STRIPE_SUCCESS_URL}
+      - STRIPE_CANCEL_URL=${STRIPE_CANCEL_URL}
+      - NATS_SERVERS=nats://nats-server:4222,nats://nats-server:4223
+    depends_on:
+      - nats-server
+  
+  orders-db:
+    container_name: orders-db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${ORDERS_DB_USER}
+      - POSTGRES_PASSWORD=${ORDERS_DB_PASSWORD}
+      - POSTGRES_DB=${ORDERS_DB_NAME}
+  
+  auth-db:
+    container_name: auth-db
+    image: prismagraphql/mongo-single-replica:5.0.3
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${AUTH_DB_NAME}
+    

@@ -55,3 +55,13 @@ cp ./auth-ms/.env.template ./auth-ms/.env
 ```bash
 docker-compose up -d
 ```
+
+# Prod
+
+1. Clone the repository
+2. Create the .envs files
+3. Execute
+
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
