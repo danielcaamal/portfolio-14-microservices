@@ -21,6 +21,7 @@ The project is divided into 3 services:
 - [NATS](https://nats.io/): For the communication between the services
 - [Stripe](https://stripe.com/): For the payment gateway
 - [JWT](https://jwt.io/): For the authentication
+- [MongoDB](https://www.mongodb.com/): For the user data
 
 ## Installation
 

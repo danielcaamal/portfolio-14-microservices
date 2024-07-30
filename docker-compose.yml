@@ -19,12 +19,22 @@ services:
       - ./client-gateway/.env
     depends_on:
       - nats-server
-  
+
+  auth-ms:
+    container_name: auth-ms
+    build: ./auth-ms
+    volumes:
+      - ./auth-ms/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./auth-ms/.env
+    depends_on:
+      - nats-server
+      - auth-db
+
   products-ms:
     container_name: products-ms
     build: ./products-ms
-    ports:
-      - "3001:3001"
     volumes:
       - ./products-ms/src:/usr/src/app/src
     command: npm run start:dev
@@ -36,21 +46,18 @@ services:
   orders-ms:
     container_name: orders-ms
     build: ./orders-ms
-    ports:
-      - "3002:3002"
     volumes:
       - ./orders-ms/src:/usr/src/app/src
     command: npm run start:dev
     env_file:
       - ./orders-ms/.env
     depends_on:
+      - nats-server
       - orders-db
 
   payments-ms:
     container_name: payments-ms
     build: ./payments-ms
-    ports:
-      - "3003:3003"
     volumes:
       - ./payments-ms/src:/usr/src/app/src
     command: npm run start:dev
@@ -70,3 +77,17 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: ordersdb
+  
+  auth-db:
+    container_name: auth-db
+    image: prismagraphql/mongo-single-replica:5.0.3
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./auth-db/data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example1234
+      MONGO_INITDB_DATABASE: authdb
+      # ME_CONFIG_MONGODB_URL: mongodb://root:example1234@auth-db:27017
+    
