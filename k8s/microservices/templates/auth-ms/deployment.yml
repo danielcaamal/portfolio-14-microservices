@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: auth-ms
+  name: auth-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-ms
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: auth-ms
+    spec:
+      containers:
+        - image: danielcaamal97/auth-ms
+          name: auth-ms
+          env:
+            - name: PORT
+              value: "3000"
+            - name: NATS_SERVERS
+              value: "nats://nats"
+            - name: DATABASE_URL
+              value: "mongodb://root:example1234@auth-db:27017/authdb?authSource=admin&directConnection=true"
+            # - name: DATABASE_URL
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: auth-secrets
+            #       key: DATABASE_URL
+            - name: JWT_SECRET
+              value: "secret"
+            # - name: JWT_SECRET
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: auth-secrets
+            #       key: JWT_SECRET
+            - name: JWT_EXPIRES_IN
+              value: "100d"
+
+          resources: {}
+status: {}

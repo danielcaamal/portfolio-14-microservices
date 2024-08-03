@@ -1,10 +1,10 @@
 # Portfolio 14 - Microservices
 
-This project is a simple example of a microservices architecture using NestJS and Docker.
+This project is a simple example of a microservices architecture using NestJS and Kubernetes.
 
 ## Introduction
 
-The project is divided into 3 services:
+The project is divided into 5 Microservices:
 
 - **Client Gateway**: The entry point of the application. It receives the requests and forwards them to the correct service as REST API.
 - **Auth Microservice**: Responsible for managing the authentication. It contains the connection with the database (PostgreSQL).
@@ -22,6 +22,8 @@ The project is divided into 3 services:
 - [Stripe](https://stripe.com/): For the payment gateway
 - [JWT](https://jwt.io/): For the authentication
 - [MongoDB](https://www.mongodb.com/): For the user data
+- [GCLOUD](https://cloud.google.com/): For the storage of the docker images and the CI/CD
+- [Kubernetes](https://kubernetes.io/): For the deployment of the services
 
 ## Installation
 
@@ -40,7 +42,6 @@ git submodule update --init --recursive
 3. Create the .envs files
 
 ```bash
-cp .env.template .env
 cp ./client-gateway/.env.template ./client-gateway/.env
 cp ./orders-ms/.env.template ./orders-ms/.env
 cp ./products-ms/.env.template ./products-ms/.env
@@ -53,15 +54,25 @@ cp ./auth-ms/.env.template ./auth-ms/.env
 5. Execute Docker Compose
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 
-# Prod
+## Installation (Production)
 
-1. Clone the repository
-2. Create the .envs files
+1. Clone the repository and update the submodules
+
+```bash
+git clone --recurse-submodules
+```
+
+2. Create the main .env file
+
+```bash
+cp .env.template .env
+```
+
 3. Execute
 
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d --build
 ```

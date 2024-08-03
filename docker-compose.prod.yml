@@ -10,7 +10,7 @@ services:
     build:
       context: ./client-gateway
       dockerfile: dockerfile.prod
-    image: client-gateway-prod
+    image: danielcaamal97/client-gateway
     ports:
       - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
     environment:
@@ -26,7 +26,7 @@ services:
       dockerfile: dockerfile.prod
       args:
         - DATABASE_URL=mongodb://${AUTH_DB_USERNAME}:${AUTH_DB_PASSWORD}@auth-db:27017/${AUTH_DB_NAME}?authSource=admin&directConnection=true
-    image: auth-ms-prod
+    image: danielcaamal97/auth-ms
     ports:
       - ${AUTH_MS_PORT}:${AUTH_MS_PORT}
     environment:
@@ -46,7 +46,7 @@ services:
       dockerfile: dockerfile.prod
       args:
         - DATABASE_URL=file:./dev.db
-    image: products-ms-prod
+    image: danielcaamal97/products-ms
     ports:
       - ${PRODUCTS_MS_PORT}:${PRODUCTS_MS_PORT}
     environment:
@@ -63,7 +63,7 @@ services:
       dockerfile: dockerfile.prod
       args:
         - DATABASE_URL=postgresql://${ORDERS_DB_USER}:${ORDERS_DB_PASSWORD}@orders-db:5432/${ORDERS_DB_NAME}
-    image: orders-ms-prod
+    image: danielcaamal97/orders-ms
     ports:
       - ${ORDERS_MS_PORT}:${ORDERS_MS_PORT}
     environment:
@@ -79,7 +79,7 @@ services:
     build:
       context: ./payments-ms
       dockerfile: dockerfile.prod
-    image: payments-ms-prod
+    image: danielcaamal97/payments-ms
     ports:
       - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
     environment:
